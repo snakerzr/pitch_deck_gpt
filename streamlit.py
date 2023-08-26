@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import openai
-import src.PitchAssistant as PitchAssistant
+from src.PitchAssistant import PitchAssistant
 
 openai.api_key = ""
 
@@ -44,10 +44,10 @@ with tab1:
                 text += ' Компания нацелена на международный рынок.'
             st.write(text[0].upper() + text[1:])
     st.title('Краткое описание стартапа')
-    short_description = st.text_area('')
+    short_description = st.text_area('',key='short_description')
 
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False: 
+    if st.button("Готово", type='primary', key=1): 
         short_description_gpt = pa.short_description(short_description)
         st.text(short_description_gpt)
 
@@ -55,7 +55,7 @@ with tab1:
     problem_description = st.text_area('', height=200)
 
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False: 
+    if st.button("Готово", type='primary', key=2):
         problem_description_gpt = pa.problem(problem_description)
         st.text(problem_description_gpt)
 
@@ -64,7 +64,7 @@ with tab1:
     value_and_description = st.text_area(' ')
 
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False: 
+    if st.button("Готово", type='primary', key=3): 
         value_and_description_gpt = pa.value(value_and_description)
         st.text(value_and_description_gpt)
 
@@ -73,14 +73,14 @@ with tab1:
     solution = st.text_area('  ')
 
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False: 
+    if st.button("Готово", type='primary', key=4):
         solution_gpt = pa.solution(solution)
         st.text(solution_gpt)
 
     
     st.title('Рынок')
-    market_option = st.selectbox('   ', ('Выберите географический тип рынка','РФ', 'Международный рынок'))
-    if market_option != 'Выберите географический тип рынка':
+    market_option = st.selectbox('   ', ('РФ', 'Международный рынок'))
+    if st.button("Готово", type='primary', key=5):
             # # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             # if False: 
         # tam = pa.market_tom(value_and_description)
@@ -116,7 +116,7 @@ with tab1:
     ...'''
 
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False: 
+    if st.button("Готово", type='primary', key=6): 
         competitors_list_gpt = pa.competitors.list(short_description_gpt)
         competitive_advantages = pa.competitive_advantages(value_and_description_gpt,competitors_list_gpt)
 
@@ -128,7 +128,7 @@ with tab1:
 
     st.title('Бизнес модель  и ценообразование')
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False: 
+    if st.button("Готово", type='primary', key=7):
         # Вопрос: Напишите способ генерации дохода и основные затраты вашего бизнеса?
         # Сначала отвечает чатгпт, дает пример, потом стартапер пишет свой
         profit_and_costs_example = pa.bis_model_profit_generation_and_costs(value_and_description_gpt)
@@ -153,7 +153,7 @@ with tab1:
     year_earnings = st.number_input('Годовая выручка (млн. руб.): ')
     clients_amount = st.number_input('Количество клиентов: ')
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False:
+    if st.button("Готово", type='primary', key=8):
         metrics = pa.fin_metrics(value_and_description_gpt,
                                     year_earnings,
                                     clients_amount)
@@ -172,7 +172,7 @@ with tab1:
     traction_and_partners_example = 'PLACEHOLDER'
 
     # IF FALSE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if False:
+    if st.button("Готово", type='primary', key=9):
         traction_and_partners_example = pa.traction_and_partners(value_and_description_gpt)
     
     st.markdown(traction_and_partners_example)
@@ -180,30 +180,30 @@ with tab1:
 
 
     st.title('Команда и борд')
-    if False:
+    if st.button("Готово", type='primary', key=10):
         team_gpt_example = pa.team_board(value_and_description_gpt)
         st.markdown(team_gpt_example)
     team = st.text_area('    ')
 
     st.title('Инвестиционный раунд')
-    if False:
+    if st.button("Готово", type='primary', key=11):
         investment_round_example = pa.investment_round(value_and_description_gpt)
         st.markdown(investment_round_example)
     investment_round = st.text_area('     ')
 
     st.title('Дорожная карта')
     roadmap = st.text_area('      ')
-    if False:
+    if st.button("Готово", type='primary', key=12):
         roadmap_gpt = pa.roadmap(roadmap)
         st.markdown(roadmap_gpt)
 
     st.title('Контакты')
     contacts = st.text_area('       ')
-    if False:
+    if st.button("Готово", type='primary', key=13):
         contacts_gpt = pa.contaсts(contacts)
 
     all_is_ready = st.button("Создать неповторимый Pitch-Deck", type='primary')
-    if all_is_ready:
+    if st.button("Готово", type='primary', key=14):
         # pa.create_presentation_text()
         pass
 

@@ -6,11 +6,11 @@ from dotenv import load_dotenv, find_dotenv
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.prompts.chat import (
-SystemMessage, 
-HumanMessage, 
-AIMessage,
-HumanMessagePromptTemplate, 
-SystemMessagePromptTemplate
+    SystemMessage,
+    HumanMessage,
+    AIMessage,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
 )
 from langchain.chains import ConversationChain, LLMChain
 from langchain.memory import ConversationBufferMemory, ChatMessageHistory
@@ -24,102 +24,93 @@ from langchain.agents import AgentExecutor
 from langchain.tools import DuckDuckGoSearchRun
 
 
-_ = load_dotenv(find_dotenv()) # загружаем open_ai_key
+_ = load_dotenv(find_dotenv())  # загружаем open_ai_key
 
-class PitchAssistant():
-    '''
-    '''
-    gpt3_4k: str = 'gpt-3.5-turbo'
-    gpt3_16k: str = 'gpt-3.5-turbo-16k'
-    gpt4_8k: str = 'gpt-4'
-    gpt4_32k: str = 'gpt-4-32k'
+
+class PitchAssistant:
+    """ """
+
+    gpt3_4k: str = "gpt-3.5-turbo"
+    gpt3_16k: str = "gpt-3.5-turbo-16k"
+    gpt4_8k: str = "gpt-4"
+    gpt4_32k: str = "gpt-4-32k"
     default_temp: str = 0.0
     high_temp: str = 0.9
     verbose: bool = False
 
     def __init__(self):
-        '''
-        '''
+        """ """
         pass
 
     # Instantiate GPT models
 
-    def _init_gpt3_model(self,high_temp=False) -> ChatOpenAI:
-        '''
-        '''
+    def _init_gpt3_model(self, high_temp=False) -> ChatOpenAI:
+        """ """
         if high_temp:
             temperature = self.high_temp
         else:
             temperature = self.default_temp
 
-        llm = ChatOpenAI(temperature=temperature,
-                         model=self.gpt3_4k)
+        llm = ChatOpenAI(temperature=temperature, model=self.gpt3_4k)
         return llm
-    
-    def _init_gpt3_16k_model(self,high_temp=False) -> ChatOpenAI:
-        '''
-        '''
+
+    def _init_gpt3_16k_model(self, high_temp=False) -> ChatOpenAI:
+        """ """
         if high_temp:
             temperature = self.high_temp
         else:
             temperature = self.default_temp
 
-        llm = ChatOpenAI(temperature=temperature,
-                         model=self.gpt3_16k)
+        llm = ChatOpenAI(temperature=temperature, model=self.gpt3_16k)
         return llm
-    
-    def _init_gpt4_model(self,high_temp=False) -> ChatOpenAI:
-        '''
-        '''
+
+    def _init_gpt4_model(self, high_temp=False) -> ChatOpenAI:
+        """ """
         if high_temp:
             temperature = self.high_temp
         else:
             temperature = self.default_temp
 
-        llm = ChatOpenAI(temperature=temperature,
-                         model=self.gpt4_8k)
+        llm = ChatOpenAI(temperature=temperature, model=self.gpt4_8k)
         return llm
-    
-    def _init_gpt4_16k_model(self,high_temp=False) -> ChatOpenAI:
-        '''
-        '''
+
+    def _init_gpt4_16k_model(self, high_temp=False) -> ChatOpenAI:
+        """ """
         if high_temp:
             temperature = self.high_temp
         else:
             temperature = self.default_temp
 
-        llm = ChatOpenAI(temperature=temperature,
-                         model=self.gpt4_16k)
+        llm = ChatOpenAI(temperature=temperature, model=self.gpt4_32k)
         return llm
-    
+
     # Create chains
 
-    def _create_llmchain(self,
-                         prompt:str,
-                         llm:ChatOpenAI,
-                         ) -> LLMChain:
-        '''
-        '''
+    def _create_llmchain(
+        self,
+        prompt: str,
+        llm: ChatOpenAI,
+    ) -> LLMChain:
+        """ """
         template = ChatPromptTemplate.from_template(prompt)
-        chain = LLMChain(prompt=template,
-                         llm=llm, 
-                         verbose=self.verbose)
-        
+        chain = LLMChain(prompt=template, llm=llm, verbose=self.verbose)
+
         return chain
-    
+
     # Create agents
-    
-    def _create_ddg_agent(self,
-                          system_message_prompt:str,
-                          llm:ChatOpenAi,
-                          ) -> AgentExecutor:
-        '''
+
+    def _create_ddg_agent(
+        self,
+        system_message_prompt: str,
+        llm: ChatOpenAI,
+    ) -> AgentExecutor:
+        """
 
         system_message_prompt:
             Example:
-            'You are very powerful assistant, 
+            'You are very powerful assistant,
             that creates a TOM, SAM, SOM analysis.'
-        '''
+        """
 
         tools = [DuckDuckGoSearchRun()]
         system_message = SystemMessage(content=system_message_prompt)
@@ -128,39 +119,35 @@ class PitchAssistant():
         agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=self.verbose)
 
         return agent_executor
-    
-    def _create_ddg_chat_zero_shot_agent(self,
-                                         llm:ChatOpenAI):
+
+    def _create_ddg_chat_zero_shot_agent(self, llm: ChatOpenAI):
         tools = [DuckDuckGoSearchRun()]
-        agent = initialize_agent(tools, 
-                                 llm, 
-                                 agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-                                 verbose=self.verbose
-                                )
+        agent = initialize_agent(
+            tools,
+            llm,
+            agent=AgentType.CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+            verbose=self.verbose,
+        )
         return agent
-    
+
     # Startup name and short description
 
-    def short_description(self,text:str) -> str:
-
-
-        prompt_question = '''Тебе нужно кратко 5 словами описание проекта из {text}, который написал стартапер. У тебя есть инструкция, которая рассказывает, как это сделать хорошо:
+    def short_description(self, text: str) -> str:
+        prompt_question = """Тебе нужно кратко 5 словами описание проекта из {text}, который написал стартапер. У тебя есть инструкция, которая рассказывает, как это сделать хорошо:
         
         Пример: 
         Мы компания для трудойстройства студентов.
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(prompt_question,llm)
-        result = chain(text)['text']
+        chain = self._create_llmchain(prompt_question, llm)
+        result = chain(text)["text"]
         return result
-    
-    def problem(self,text:str) -> str:
 
+    def problem(self, text: str) -> str:
+        role = """Ты превосходный специалист по созданию питч деков. Сейчас ты помогаешь владельцу стартапа написать отличный питч дек."""
 
-        role = '''Ты превосходный специалист по созданию питч деков. Сейчас ты помогаешь владельцу стартапа написать отличный питч дек.'''
-        
-        details = '''
+        details = """
         Первым этапом проработки питч-дека является проработка проблемы.
         Проблема - это то, что пытается решить стартап. 
         Проблема – это начальные условия, определяющие контекст, в котором ваша компания может расти быстро. Хорошая проблема популярна, растет, требует срочного решения, дорогостояща, обязательна и встречается часто. Инсайт в проблему показывает, почему ваше решение имеет конкурентное преимущество в плане роста. Выбирайте проблемы, которые соответствуют этим характеристикам, чтобы убедить инвесторов и привлечь внимание пользователей.
@@ -185,28 +172,28 @@ class PitchAssistant():
         Решение проблемы потребует больших затрат, что открывает возможности для высокой оплаты.
         Законодательство изменилось, создавая дополнительные проблемы для решения.
         Проблему необходимо решать несколько раз в день.
-        '''
+        """
 
-        instruction = '''
+        instruction = """
         Задачи:
         Постарайся расписать проблему, опираясь на текст стартапера, пройдясь по всем пунктам хорошей проблемы, которая заинтересовывает инвесторов.
         Сформируй содержание слайда с акцентом на те характеристики, которые являются наиболее привлекательными для инвестора.
-        '''      
+        """
 
-        text_entry = '''
+        text_entry = """
         Текст стартапера:
         {text}
-        '''     
+        """
 
-        conversation_prompt = role+details+instruction+text_entry
+        conversation_prompt = role + details + instruction + text_entry
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(conversation_prompt,llm)
-        raw_result = chain(text)['text']
+        chain = self._create_llmchain(conversation_prompt, llm)
+        raw_result = chain(text)["text"]
 
         # style correction
 
-        style_description = '''
+        style_description = """
         СТИЛЬ:
         ```
         Here are the detailed instructions or style of speech for each of the mentioned topics:
@@ -252,31 +239,28 @@ class PitchAssistant():
         Imagine someone who has never encountered your concept before and ensure that your description helps them grasp its significance.
         In summary, the style of speech involves using simple, clear, and concise language while avoiding unnecessary padding or jargon. Incorporate empathy for both investors and potential users by crafting descriptions that are easy to understand, relatable, and compelling. Utilize the "X for Y" formula effectively to highlight your startup's value proposition.
         ```
-        '''        
+        """
 
-        style_instruction = '''
+        style_instruction = """
         ИНСТРУКЦИЯ:
         Примени СТИЛЬ к ТЕКСТУ.
 
         ТЕКСТ:
         {text}
-        '''        
+        """
 
         style_prompt = style_description + style_instruction
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(style_prompt,llm)
-        result = chain(raw_result)['text']
-
+        chain = self._create_llmchain(style_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
-    
-    def value(self,text:str) -> str:
-        '''
-        
-        '''
 
-        question_prompt = '''Напиши ценностное предложение стартапа из ответа {text} по пунктам.
+    def value(self, text: str) -> str:
+        """ """
+
+        question_prompt = """Напиши ценностное предложение стартапа из ответа {text} по пунктам.
 
         Учти след. информацию:
         <<Если вы строите маркетплейс или платформу, которая может монополизировать рынок, это может быть значительным преимуществом. Важно также удостовериться, что вы сможете укрепить свои позиции с ростом.>>
@@ -288,11 +272,11 @@ class PitchAssistant():
         ● Оценивает и определяет навыки и компетентность лиц, ищущих работу>>
 
 
-        '''        
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(question_prompt,llm)
-        raw_result = chain(text)['text']
+        chain = self._create_llmchain(question_prompt, llm)
+        raw_result = chain(text)["text"]
 
         gpt_prompt = """У тебя есть текст {text}, по которому будут рассказывать презентацию, тебе нужно сократить этот текст до минимума, чтобы поместить на слайд презентации. Дополнительно есть инструкции к формированию:
 
@@ -306,36 +290,34 @@ class PitchAssistant():
         Зрительная привлекательность>>!!
 
 
-        """        
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(gpt_prompt,llm)
-        result = chain(raw_result)['text']
-
+        chain = self._create_llmchain(gpt_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
-    
-    def solution(self,text:str) -> str:
-        '''
-        '''
 
-        super_product_description = '''
+    def solution(self, text: str) -> str:
+        """ """
+
+        super_product_description = """
         Супер Продукт:   
         Очевидное преимущество - продукт, который значительно лучше конкурентов. Продукт должен быть на порядок (в 10 раз) более привлекательным и эффективным.
-        '''       
+        """
 
-        solution_instruction = '''
+        solution_instruction = """
         ЗАГЛУШКА
         {text}
-        '''        
+        """
 
         solution_prompt = super_product_description + solution_instruction
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(solution_prompt,llm)
-        raw_result = chain(text)['text']
+        chain = self._create_llmchain(solution_prompt, llm)
+        raw_result = chain(text)["text"]
 
-        style_description = '''
+        style_description = """
         СТИЛЬ:
         ```
         Here are the detailed instructions or style of speech for each of the mentioned topics:
@@ -381,41 +363,41 @@ class PitchAssistant():
         Imagine someone who has never encountered your concept before and ensure that your description helps them grasp its significance.
         In summary, the style of speech involves using simple, clear, and concise language while avoiding unnecessary padding or jargon. Incorporate empathy for both investors and potential users by crafting descriptions that are easy to understand, relatable, and compelling. Utilize the "X for Y" formula effectively to highlight your startup's value proposition.
         ```
-        '''        
+        """
 
-        style_instruction = '''
+        style_instruction = """
         ИНСТРУКЦИЯ:
         Примени СТИЛЬ к ТЕКСТУ.
 
         ТЕКСТ:
         {text}
-        '''        
+        """
 
         style_prompt = style_description + style_instruction
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(style_prompt,llm)
-        result = chain(raw_result)['text']
+        chain = self._create_llmchain(style_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
-    
-    def market_tom(self, text:str) -> str:
-        '''
-        '''
 
-        tom_sys_prompt = "You are very powerful assistant, that creates a TOM, SAM, SOM analysis."
+    def market_tom(self, text: str) -> str:
+        """ """
+
+        tom_sys_prompt = (
+            "You are very powerful assistant, that creates a TOM, SAM, SOM analysis."
+        )
 
         llm = self._init_gpt3_model()
-        agent = self._create_ddg_agent(tom_sys_prompt,llm)
+        agent = self._create_ddg_agent(tom_sys_prompt, llm)
         result = agent(text)
 
         return result
-    
-    def market_tom_summary(self, text:str) -> str:
-        '''
-        '''
 
-        market_tom_summary_prompt = '''Extract only
+    def market_tom_summary(self, text: str) -> str:
+        """ """
+
+        market_tom_summary_prompt = """Extract only
         market size:
         number of clients:
         demand: 
@@ -424,18 +406,16 @@ class PitchAssistant():
 
         Text to extract from:
         {text}
-        '''        
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(style_prompt,llm)
-        result = chain(raw_result)['text']
+        chain = self._create_llmchain(style_prompt, llm)
+        result = chain(raw_result)["text"]
 
-    
-    def market_sam_instruction(self, text:str) -> str:
-        '''
-        '''
+    def market_sam_instruction(self, text: str) -> str:
+        """ """
 
-        sam_instruction_for_client_prompt = '''
+        sam_instruction_for_client_prompt = """
 
         Измени шаблон инструкции в соответствии с описанием компании, чтобы владельцу компании было легко собрать необходимые данные и посчитать SAM.
 
@@ -463,19 +443,18 @@ class PitchAssistant():
 
         Описание компании:
         {text}
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(sam_instruction_for_client_prompt,llm)
-        result = chain(text)['text']
+        chain = self._create_llmchain(sam_instruction_for_client_prompt, llm)
+        result = chain(text)["text"]
 
         return result
-    
-    def market_som_instruction(self, text:str) -> str:
-        '''
-        '''
 
-        som_instruction_for_client_prompt = '''
+    def market_som_instruction(self, text: str) -> str:
+        """ """
+
+        som_instruction_for_client_prompt = """
 
         Измени шаблон инструкции в соответствии с описанием компании, чтобы владельцу компании было легко собрать необходимые данные и посчитать SAM.
 
@@ -500,112 +479,102 @@ class PitchAssistant():
 
         Описание компании:
         {text}
-        '''        
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(som_instruction_for_client_prompt,llm)
-        result = chain(text)['text']
-
-        return result
-    
-        
-    def competitors_list(self, short_company_description:str) -> str:
-        '''
-        '''
-
-        agent_description = '''You are very powerful assistant, that finds competitors in the internet. If your search doesnt yeild result,
-        you can be creative and try different creative search queries for up to 3 times.'''
-
-        prompt = f'Find competitors for a company that {short_company_description} in russia'
-
-        llm = self._init_gpt3_model()
-        agent = self._create_ddg_agent(agent_description,llm)
-        result = agent(prompt)['output']
+        chain = self._create_llmchain(som_instruction_for_client_prompt, llm)
+        result = chain(text)["text"]
 
         return result
 
-    def competitive_advantages(self, 
-                               company_description: str,
-                               competitors_description: str) -> str:
-        '''
-        '''
-        
-        agent_description = '''You are a very powerful assistant who determines the competitive advantages of the company in relation to its competitors. You are given the name of the company and its description, as well as the names of competitors. If necessary, you can search for additional information about competitors in order to deduce the company's competitive advantages.'''
+    def competitors_list(self, short_company_description: str) -> str:
+        """ """
+
+        agent_description = """You are very powerful assistant, that finds competitors in the internet. If your search doesnt yeild result,
+        you can be creative and try different creative search queries for up to 3 times."""
+
+        prompt = (
+            f"Find competitors for a company that {short_company_description} in russia"
+        )
 
         llm = self._init_gpt3_model()
-        agent = self._create_ddg_agent(agent_description,llm)
+        agent = self._create_ddg_agent(agent_description, llm)
+        result = agent(prompt)["output"]
 
-        text = f'''Название и описание компании: {company_description}
+        return result
+
+    def competitive_advantages(
+        self, company_description: str, competitors_description: str
+    ) -> str:
+        """ """
+
+        agent_description = """You are a very powerful assistant who determines the competitive advantages of the company in relation to its competitors. You are given the name of the company and its description, as well as the names of competitors. If necessary, you can search for additional information about competitors in order to deduce the company's competitive advantages."""
+
+        llm = self._init_gpt3_model()
+        agent = self._create_ddg_agent(agent_description, llm)
+
+        text = f"""Название и описание компании: {company_description}
 
         Текст, в котором присутствуют конкуренты:
         {competitors_description}
 
         Тебе нужно вывести конкурентные преимущества компании.
-        '''
-        result = agent(text)['output']
+        """
+        result = agent(text)["output"]
 
         return result
-    
 
-    def bis_model_profit_generation_and_costs(self,
-                                              company_description:str) -> str:
-        '''
-        '''
+    def bis_model_profit_generation_and_costs(self, company_description: str) -> str:
+        """ """
 
-        prompt = '''Напиши способы генерация дохода и основные затраты бизнеса по описанию компании.
+        prompt = """Напиши способы генерация дохода и основные затраты бизнеса по описанию компании.
 
         Описание компании:
         {text}
-        '''        
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(prompt,llm)
-        result = chain(company_description)['text']
+        chain = self._create_llmchain(prompt, llm)
+        result = chain(company_description)["text"]
 
         return result
-    
-    def bis_model_acquisition_channels(self,
-                                       company_description:str) -> str:
-        '''
-        '''
 
-        prompt = '''Напиши о том, какие каналы привлечения клиентов используются в бизнесе по описанию компании.
+    def bis_model_acquisition_channels(self, company_description: str) -> str:
+        """ """
+
+        prompt = """Напиши о том, какие каналы привлечения клиентов используются в бизнесе по описанию компании.
 
         Описание компании:
         {text}
-        '''   
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(prompt,llm)
-        result = chain(company_description)['text']
+        chain = self._create_llmchain(prompt, llm)
+        result = chain(company_description)["text"]
 
         return result
-    
-    def bis_model_scaling(self,
-                          company_description:str) -> str:
-        '''
-        '''
 
-        prompt = '''Напиши о том, как можно масштабировать бизнес модель по описанию компании.
+    def bis_model_scaling(self, company_description: str) -> str:
+        """ """
+
+        prompt = """Напиши о том, как можно масштабировать бизнес модель по описанию компании.
 
         Описание компании:
         {text}
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(prompt,llm)
-        result = chain(company_description)['text']
+        chain = self._create_llmchain(prompt, llm)
+        result = chain(company_description)["text"]
 
         return result
-    
-    def fin_metrics(self,
-                    company_description:str,
-                    revenue:int,
-                    client_n:int) -> dict:
-        '''
-        '''
 
-        classification_prompt = '''Сообщение нужно отнести только к определенному классу:
+    def fin_metrics(
+        self, company_description: str, revenue: int, client_n: int
+    ) -> dict:
+        """ """
+
+        classification_prompt = """Сообщение нужно отнести только к определенному классу:
         <<Тебе нужно вывести число!>>
 
         Класс 0 - Бизнес относится к "Энергетика и коммунальные услуги"
@@ -623,45 +592,41 @@ class PitchAssistant():
         Пример вывода: 1
 
         СООБЩЕНИЕ:<<<{message}>>>
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(classification_prompt,llm)
-        bis_class = chain(company_description)['text']        
+        chain = self._create_llmchain(classification_prompt, llm)
+        bis_class = chain(company_description)["text"]
 
-        churn_rate_by_industry = {'Энергетика и коммунальные услуги':.11,
-                          'ИТ-услуги':.12,
-                          'ПО':.14,
-                          'Производство промышленного оборудования':.17,
-                          'Финансовый сектор услуг':.19,
-                          'Профессиональные услуги: бухгалтерские, юридические, инженерные и т.д.':.27,
-                          'Телекоммуникации':.31,
-                          'Производство товаров':.35,
-                          'Транспорт и перевозки':.40,
-                          'Производство потребительских товаров':.40,
-                          'Оптовая торговля':.56}
-        
+        churn_rate_by_industry = {
+            "Энергетика и коммунальные услуги": 0.11,
+            "ИТ-услуги": 0.12,
+            "ПО": 0.14,
+            "Производство промышленного оборудования": 0.17,
+            "Финансовый сектор услуг": 0.19,
+            "Профессиональные услуги: бухгалтерские, юридические, инженерные и т.д.": 0.27,
+            "Телекоммуникации": 0.31,
+            "Производство товаров": 0.35,
+            "Транспорт и перевозки": 0.40,
+            "Производство потребительских товаров": 0.40,
+            "Оптовая торговля": 0.56,
+        }
+
         revenue = 100000
         client_n = 300
         arpu = revenue / client_n
         churn_rate = list(churn_rate_by_industry.values())[int(bis_class)]
         lt = 1 / churn_rate
         ltv = APRU * LT
-        
-        result = {'ARPU':arpu,
-                  'churn_rate':churn_rate,
-                  'LT': lt,
-                  'LTV': ltv}
-        
+
+        result = {"ARPU": arpu, "churn_rate": churn_rate, "LT": lt, "LTV": ltv}
+
         return result
-    
 
-    def traction_and_partners(self,
-                              company_description:str) -> str:
-        '''
-        '''
+    def traction_and_partners(self, company_description: str) -> str:
+        """ """
 
-        prompt = '''Напиши пример трекшна и партнерствах в бизнесе по описанию компании.
+        prompt = """Напиши пример трекшна и партнерствах в бизнесе по описанию компании.
 
         Термин "трекшн" (англ. "traction") в бизнес-контексте обозначает показатель или показатели, которые демонстрируют рост, прогресс или успешность стартапа или бизнеса. Это может быть количественные данные, которые отражают увеличение клиентской базы, продажи продуктов или услуг, пользовательскую активность, доходы и т.д. Короче говоря, трекшн - это подтверждение того, что бизнес-идея работает на практике и привлекает интерес со стороны пользователей или клиентов.
 
@@ -680,19 +645,18 @@ class PitchAssistant():
 
         Описание компании:
         {text}
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(prompt,llm)
-        result = chain(company_description)['text']
+        chain = self._create_llmchain(prompt, llm)
+        result = chain(company_description)["text"]
 
         return result
-    
-    def team_board(self, company_description:str) -> str:
-        '''
-        '''
 
-        question_prompt = '''Напиши короткую информацию о команде, бекграунде и текущих инвесторах/эдвайзерах {text} по пунктам.
+    def team_board(self, company_description: str) -> str:
+        """ """
+
+        question_prompt = """Напиши короткую информацию о команде, бекграунде и текущих инвесторах/эдвайзерах {text} по пунктам.
 
 
         Пример: 
@@ -704,33 +668,31 @@ class PitchAssistant():
         ● Оценивает и определяет навыки и компетентность лиц, ищущих работу>>
 
 
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(question_prompt,llm)
-        result = chain(company_description)['text']
+        chain = self._create_llmchain(question_prompt, llm)
+        result = chain(company_description)["text"]
 
         return result
-    
-    def investment_round(self,company_description:str) -> str:
-        '''
-        '''
 
-        question_prompt = '''Сделай описание инвестиционного раунда для компании:
+    def investment_round(self, company_description: str) -> str:
+        """ """
+
+        question_prompt = """Сделай описание инвестиционного раунда для компании:
         {text}
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(question_prompt,llm)
-        result = chain(company_description)['text']
+        chain = self._create_llmchain(question_prompt, llm)
+        result = chain(company_description)["text"]
 
-        return result        
-    
-    def roadmap(self, text:str) -> str:
-        '''
-        '''
+        return result
 
-        question_prompt = '''Напиши дорожную карту по описанию {text} по пунктам. Дорожная карта должна представлять себя год и что в этот год будет сделано.
+    def roadmap(self, text: str) -> str:
+        """ """
+
+        question_prompt = """Напиши дорожную карту по описанию {text} по пунктам. Дорожная карта должна представлять себя год и что в этот год будет сделано.
 
         Если человек указал года, то указывай их так, как указал человек.
 
@@ -744,11 +706,11 @@ class PitchAssistant():
         ● Оценивает и определяет навыки и компетентность лиц, ищущих работу>>
 
 
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(question_prompt,llm)
-        raw_result = chain(text)['text']
+        chain = self._create_llmchain(question_prompt, llm)
+        raw_result = chain(text)["text"]
 
         gpt_prompt = """У тебя есть текст {text}, тебе нужно сократить этот текст до минимума, чтобы поместить на слайд презентации. Дополнительно есть инструкции к формированию:
 
@@ -767,23 +729,21 @@ class PitchAssistant():
         """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(gpt_prompt,llm)
-        result = chain(raw_result)['text']
+        chain = self._create_llmchain(gpt_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
-    
-    def contaсts(self, text:str) -> str:
-        '''
-        '''
 
-        prompt = '''Сформируй текст для слайда из текста:
+    def contaсts(self, text: str) -> str:
+        """ """
+
+        prompt = """Сформируй текст для слайда из текста:
         
         {text}
-        '''
+        """
 
         llm = self._init_gpt3_model()
-        chain = self._create_llmchain(prompt,llm)
-        result = chain(text)['text']
+        chain = self._create_llmchain(prompt, llm)
+        result = chain(text)["text"]
 
-        return result        
-
+        return result
