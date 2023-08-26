@@ -509,16 +509,18 @@ class PitchAssistant():
         return result
     
         
-    def competitors_list(self, text:str) -> str:
+    def competitors_list(self, short_company_description:str) -> str:
         '''
         '''
 
         agent_description = '''You are very powerful assistant, that finds competitors in the internet. If your search doesnt yeild result,
         you can be creative and try different creative search queries for up to 3 times.'''
 
+        prompt = f'Find competitors for a company that {short_company_description} in russia'
+
         llm = self._init_gpt3_model()
         agent = self._create_ddg_agent(agent_description,llm)
-        result = agent(text)['output']
+        result = agent(prompt)['output']
 
         return result
 
