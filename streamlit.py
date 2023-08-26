@@ -4,7 +4,7 @@ import openai
 
 openai.api_key = ""
 
-s = pd.read_csv('startups.csv')
+s = pd.read_csv('data/startups.csv')
 
 tab1, tab2 = st.tabs(['Cбор информации', 'Генерация лого'])
 with tab1:
