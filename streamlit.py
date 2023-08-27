@@ -281,9 +281,12 @@ with tab1:
     year_earnings = st.number_input('Годовая выручка (млн. руб.): ',key='year_earnings')
     clients_amount = st.number_input('Количество клиентов: ',key='clients_amount')
     if st.button("Рассчитать метрики", type='primary', key=8):
-        metrics = pa.fin_metrics(st.session_state['value_and_description_gpt'],
-                                    year_earnings,
-                                    clients_amount)
+        try:
+            metrics = pa.fin_metrics(st.session_state['value_and_description_gpt'],
+                                        year_earnings,
+                                        clients_amount)
+        except:
+            pass
         st.session_state['metrics'] = metrics
             
     st.markdown(st.session_state['metrics'])
