@@ -128,12 +128,14 @@ with tab1:
                 if text[-1] != '.':
                     text += '.'
                 text += ' Компания нацелена на международный рынок.'
-            st.write(text[0].upper() + text[1:])
-            if sbis_link != '':
+            try:
                 revenue, profit, company_cost, sales, capital = parse_financial_indicators(sbis_link)
                 if text[-1] != '.':
                     text += '.'
                 text += ' Стоимость компании ' + str(company_cost) + '.'
+            except:
+                pass
+            st.write(text[0].upper() + text[1:])
 
     # Краткое описание стартапа
     st.title('Краткое описание стартапа')
