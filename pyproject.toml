@@ -16,6 +16,7 @@ chromadb = "^0.4.7"
 duckduckgo-search = "^3.8.5"
 bs4 = "^0.0.1"
 tqdm = "^4.66.1"
+python-pptx = "^0.6.21"
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^4.0.5"
