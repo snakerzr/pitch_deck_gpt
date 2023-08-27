@@ -562,6 +562,19 @@ files = [
 cffi = ">=1.0.0"
 
 [[package]]
+name = "bs4"
+version = "0.0.1"
+description = "Dummy package for Beautiful Soup"
+optional = false
+python-versions = "*"
+files = [
+    {file = "bs4-0.0.1.tar.gz", hash = "sha256:36ecea1fd7cc5c0c6e4a1ff075df26d50da647b75376626cc186e2212886dd3a"},
+]
+
+[package.dependencies]
+beautifulsoup4 = "*"
+
+[[package]]
 name = "cachetools"
 version = "5.3.1"
 description = "Extensible memoizing collections and decorators"
@@ -4516,4 +4529,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "cfe88b0b452feb0d0cd6b3252bdb3f8c0dc58233a804c84ed3cb2aed463bd42d"
+content-hash = "ea57c3f9f25faeeb88ee777da8d4b42cbcd57341a5cc849100e46c0d8bb7761c"
