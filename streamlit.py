@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import openai
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+import requests
 from src.PitchAssistant import PitchAssistant
 
 default_session_state_dict = {"short_description_gpt": '', 
@@ -65,6 +68,27 @@ for key, value in default_session_state_dict.items():
 #             #  captions=sidebar_radio_captions,
 #              key='page_n')
 
+def parse_financial_indicators(link: str):
+    response = requests.get(link)
+    try:
+        soup = BeautifulSoup(response.content)
+    except:
+        print(f"Ошибка запроса: {response.status_code}")
+
+    financial_indicators = soup.find_all("span", {"class": "cCard__BlockMaskSum"})
+    profitability_indicators = soup.find_all("div", {"class": "cCard__BlockRating cCard__Padding10"})
+    # Выручка
+    revenue = financial_indicators[0].text
+    # Прибыль
+    profit = financial_indicators[1].text
+    # Стоимость компании
+    company_cost = financial_indicators[2].text
+    # рентабильность продаж
+    sales = profitability_indicators[0].text
+    # рентаьельность капитала
+    capital = profitability_indicators[1].text
+
+    return revenue, profit, company_cost, sales, capital
 
 s = pd.read_csv('data/startups.csv')
 
@@ -105,6 +129,11 @@ with tab1:
                     text += '.'
                 text += ' Компания нацелена на международный рынок.'
             st.write(text[0].upper() + text[1:])
+            if sbis_link != '':
+                revenue, profit, company_cost, sales, capital = parse_financial_indicators(sbis_link)
+                if text[-1] != '.':
+                    text += '.'
+                text += ' Стоимость компании ' + str(company_cost) + '.'
 
     # Краткое описание стартапа
     st.title('Краткое описание стартапа')
