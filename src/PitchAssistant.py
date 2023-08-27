@@ -369,9 +369,9 @@ class PitchAssistant:
             f"Find competitors for a company that {short_company_description} in russia"
         )
 
-        llm = self._init_gpt3_model()
+        # llm = self._init_gpt3_model()
         # llm = self._init_gpt4_model(high_temp=True)
-        # llm = self._init_gpt4_model(high_temp=False)
+        llm = self._init_gpt4_model(high_temp=False)
         agent = self._create_ddg_agent(agent_description, llm)
         raw_result = agent(prompt)["output"]
 
@@ -398,9 +398,9 @@ class PitchAssistant:
 
         agent_description = """You are a very powerful assistant who determines the competitive advantages of the company in relation to its competitors. You are given the name of the company and its description, as well as the names of competitors. If necessary, you can search for additional information about competitors in order to deduce the company's competitive advantages."""
 
-        llm = self._init_gpt3_model()
+        # llm = self._init_gpt3_model()
         # llm = self._init_gpt4_model(high_temp=True)
-        # llm = self._init_gpt4_model(high_temp=False)
+        llm = self._init_gpt4_model(high_temp=False)
         agent = self._create_ddg_agent(agent_description, llm)
 
         text = f"""Название и описание компании: {company_description}
@@ -718,15 +718,124 @@ class PitchAssistant:
         roadmap_gpt  = streamlit_session_state['roadmap_gpt']
         contacts  = streamlit_session_state['contacts']
         contacts_gpt  = streamlit_session_state['contacts_gpt']
+
+        result = f'''
+        Для титульного слайда.
+        Название компании: {company_name}
+        Краткое описание по версии владельца: {short_description}
+        Альтерантивное краткое описание для выбора: {short_description_gpt}
+
+        Для слайда проблема.
+        Описание проблемы по версии владельца: {problem_description}
+        Альтернативное описание проблемы: {problem_description_gpt}
+
+        Для слайда описание и ценностное предложение стартапа.
+        Описание и ценностное предложение стартапа по версии владельца: {value_and_description}
+        Альтернативное описание и ценностное предложение стартапа: {value_and_description_gpt}
+
+        Для слайда решение.
+        Описание решения по версии владельца: {solution}
+        Альтернативное описание решения: {solution_gpt}
+
+        Для слайда Рынок.
+        Total Adressable Market для слайда Рынок: {tam}
+        Численные показатели Total Adressable Market для слайда Рынок: {tam_summary}
+        Serviceable Available Market для слайда Рынок: {sam}
+        Serviceable Obtainable Market для слайда Рынок: {som}
+
+        Для слайда конкуренты.
+        Список и описание конкурентов: {competitors_list_gpt}
+        Конкурентные преимущества:  {competitive_advantages_gpt}
+
+        Для слайда бизнес-модель и ценообразование
+        Способ генерации дохода и основные затраты по версии владельца: {business_model_1}g
+        Каналы привлечения клиента по версии владельца: {business_model_2}
+        Масштабирование бизнес-модели по версии владельца {business_model_3}
+
+        Для слайда трекшн и финансы.
+        Годовая выручка: {str(year_earnings)} млн. руб
+        Количество клиентов: {str(clients_amount)}
+        Метрики: {str(metrics)}
+        Трекшн и партнеры по версии клиента: {traction_and_partners}
+
+        Для слайда команда и борд.
+        Команда и борд по версии владельца:  {team}
+
+        Для слайда инвестиционный раунд.
+        Описание инвестиционного раунда и целей инвестиций по версии владельца: {investment_round}
+
+        Для слайда роадмап.
+        Роадмап по версии владельца: {roadmap}
+
+        Для слайда контакты.
+        Контакты по версии владельца: {contacts}
+
+        
+        '''
+        return result
     
     # Финальное создание текста презентации
     
-    def create_presentation_text(self,) -> str:
+    def create_presentation_text(self,streamlit_session_state:dict) -> str:
         '''
         '''
+        info = self._text_preproc_for_presentation(streamlit_session_state)
+        prompt = '''ИНСТРУКЦИЯ:
+        Составь презентацию из 12 слайдов:
+        1. Титульный - с названием компании и кратким описанием
+        2. Проблема - описание проблемы, которую решает стартап
+        3. Описание и ценностное предложение стартапа
+        4. Решение
+        5. Рынок
+        6. Конкуренты
+        7. Бизнес-модель и ценообразование
+        8. Трекшн и финансы
+        9. Команда и борд
+        10. Инвестиционный раунд
+        11. Роадмап
+        12. Контактная информация
 
-        prompt = ''''''
+        {text}
+        '''
 
-        llm = self._init_gpt4_32k_model()
+        llm = self._init_gpt4_model()
         chain = self._create_llmchain(prompt,llm)
-        result = chain(text)['text']
+        result = chain(info)['text']
+
+        return result
+    
+    def create_presentation_text_agent(self,streamlit_session_state:dict) -> str:
+        '''
+        '''
+        info = self._text_preproc_for_presentation(streamlit_session_state)
+        prompt = '''ИНСТРУКЦИЯ:
+        Составь презентацию из 12 слайдов:
+        1. Титульный - с названием компании и кратким описанием
+        2. Проблема - описание проблемы, которую решает стартап
+        3. Описание и ценностное предложение стартапа
+        4. Решение
+        5. Рынок
+        6. Конкуренты
+        7. Бизнес-модель и ценообразование
+        8. Трекшн и финансы
+        9. Команда и борд
+        10. Инвестиционный раунд
+        11. Роадмап
+        12. Контактная информация
+
+        Текст:
+        ```
+        {text}
+        ```
+
+        Если каких-то пунктов не хватает или их нет можешь найти информацию об этом в интернете или придумать.
+        Все слайды должны быть заполнены.
+
+        Напиши по русски.
+        '''
+
+        llm = self._init_gpt4_model(high_temp=False)
+        chain = self._create_ddg_agent(prompt,llm)
+        result = chain(info)['output']
+
+        return result
