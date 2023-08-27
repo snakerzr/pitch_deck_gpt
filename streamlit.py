@@ -363,7 +363,7 @@ with tab1:
     #     st.write(key)
 
 with tab2:
-    openai.api_key = os.environ['OPEN_AI_KEY']
+    openai.api_key = os.environ['OPENAI_API_KEY ']
     photo_prompt = st.text_input('Описание логотипа стартапа: ')
     if st.button("Создать логотип", type='primary'):
         response = openai.Image.create(
