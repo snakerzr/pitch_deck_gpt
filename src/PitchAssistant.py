@@ -74,7 +74,7 @@ class PitchAssistant:
         llm = ChatOpenAI(temperature=temperature, model=self.gpt4_8k)
         return llm
 
-    def _init_gpt4_16k_model(self, high_temp=False) -> ChatOpenAI:
+    def _init_gpt4_32k_model(self, high_temp=False) -> ChatOpenAI:
         """ """
         if high_temp:
             temperature = self.high_temp
@@ -151,19 +151,6 @@ class PitchAssistant:
         Первым этапом проработки питч-дека является проработка проблемы.
         Проблема - это то, что пытается решить стартап. 
         Проблема – это начальные условия, определяющие контекст, в котором ваша компания может расти быстро. Хорошая проблема популярна, растет, требует срочного решения, дорогостояща, обязательна и встречается часто. Инсайт в проблему показывает, почему ваше решение имеет конкурентное преимущество в плане роста. Выбирайте проблемы, которые соответствуют этим характеристикам, чтобы убедить инвесторов и привлечь внимание пользователей.
-        У проблемы, которая привлекательная для инвесторов есть характеристики:
-
-        1. Популярность: Популярность проблемы означает, что она актуальна для большого числа людей. Большой спрос на решение этой проблемы подразумевает, что существует значительная группа людей, которые сталкиваются с ней и ищут способы ее решения. Чем более широко проблема распространена, тем выше потенциал для быстрого роста вашей компании. В сущности, это уже текущий объем потенциальных клиентов.
-
-        2. Рост: Рост проблемы означает, что рынок, связанный с этой проблемой, растет быстрее, чем другие рынки. Это может быть обусловлено повышенным спросом на решение данной проблемы или изменениями в обществе, экономике или технологиях, которые стимулируют увеличение количества людей, сталкивающихся с этой проблемой. Иметь дело с растущей проблемой означает, что у вашей компании есть потенциал привлечь все больше пользователей и клиентов, что может способствовать быстрому росту бизнеса. В сущности, это степень роста рынка этой проблемы.
-
-        3. Срочность: Проблема считается срочной, если ее решение требуется немедленно или в ближайшем будущем. Срочные проблемы обычно вызывают дискомфорт, требуют внимания и действий в краткосрочной перспективе. Когда пользователи осознают, что проблема требует немедленного решения, это может способствовать активному поиску подходящих решений, включая продукты и услуги, предлагаемые вашим стартапом. В сущности, это характеристика или степень безотлагательности решения проблемы.
-
-        4. Затраты: В данном контексте затраты на решение проблемы скорее означают, что пользователи могут быть готовы платить значительные суммы за эффективное решение данной проблемы. То есть, если проблема дорогостояща для пользователей, то ваш стартап может предлагать решение, которое оправдывает эти затраты. В сущности, это денежный объем рынка проблемы.
-
-        5. Обязательность: Проблема с обязательностью означает, что люди должны решить ее по каким-то обстоятельствам. Это может быть связано с законодательством, регулированием, требованиями индустрии или другими факторами, которые обязывают пользователей найти способы решить данную проблему. Проблемы, которые обязательны к решению, создают своеобразную неотложность для пользователей, и это может стимулировать их активное взаимодействие с вашим стартапом, предоставляющим решение этой обязательной проблемы.
-
-        6. Частота: Проблема с частотой означает, что она проявляется у людей с высокой регулярностью или в определенные моменты времени. Это может быть проблема, с которой пользователи сталкиваются неоднократно, возможно, даже ежедневно или еженедельно. Проблемы с высокой частотой обеспечивают множество возможностей для вашего стартапа взаимодействовать с пользователями и предоставлять им решения. Когда проблема проявляется с высокой частотой, это может создать более постоянную потребность в решении, что способствует удержанию пользователей и стимулирует повторные взаимодействия с вашим продуктом или услугой.
 
         Пример идеальных характеристик проблем для стартапа:
         Миллионы пользователей сталкиваются с этой проблемой.
@@ -176,8 +163,11 @@ class PitchAssistant:
 
         instruction = """
         Задачи:
-        Постарайся расписать проблему, опираясь на текст стартапера, пройдясь по всем пунктам хорошей проблемы, которая заинтересовывает инвесторов.
-        Сформируй содержание слайда с акцентом на те характеристики, которые являются наиболее привлекательными для инвестора.
+        Кратко опиши проблему по пунктам, чтобы в каждом слове было максимум 5 слов, для слайда презентации, чтобы не было много текста. 
+
+        Пример вывода: 
+        <<- Недостаток средств для реализации
+        - Мало времени для создания презентации>>
         """
 
         text_entry = """
@@ -189,71 +179,7 @@ class PitchAssistant:
 
         llm = self._init_gpt3_model()
         chain = self._create_llmchain(conversation_prompt, llm)
-        raw_result = chain(text)["text"]
-
-        # style correction
-
-        style_description = """
-        СТИЛЬ:
-        ```
-        Here are the detailed instructions or style of speech for each of the mentioned topics:
-
-        Simplicity and Clarity:
-
-        Use straightforward language that anyone can understand, avoiding complex terminology or convoluted explanations.
-        Present your idea in a way that leaves no room for interpretation or confusion. Make it crystal clear.
-        Focus on making your idea easily digestible, ensuring that even someone unfamiliar with your field can comprehend it.
-        Eliminate any vagueness or ambiguity in your description. Be explicit about what your startup does and the problem it solves.
-        Stay away from using jargon, buzzwords, or language that might not resonate with a broader audience.
-        Conciseness:
-
-        Condense your description to the most essential points. Trim away any extraneous details.
-        Craft a succinct and powerful statement that encapsulates the core of your startup's value proposition.
-        Prioritize brevity while still conveying the crucial aspects of your idea. Every word should serve a purpose.
-        Avoiding Padding:
-
-        Remove any unnecessary fluff or filler content from your pitch or description.
-        Stay focused on the key elements that make your startup unique and valuable. Discard information that doesn't contribute to this understanding.
-        Resist the temptation to add defensive explanations or preemptive responses to potential concerns. Let your idea stand on its merits.
-        "X for Y" Formula:
-
-        Choose a well-known and successful entity (X) that shares similarities with your startup's concept.
-        Clearly state the comparison: "We are the X for Y," indicating the familiar model you're adapting.
-        Highlight how Y, your target market or segment, can benefit from the attributes of X's model.
-        Ensure that the connection between X and Y is easily understandable, even to someone unfamiliar with either.
-        Empathy for Investors:
-
-        Put yourself in the shoes of investors who have limited time to review many ideas.
-        Craft your pitch and descriptions in a way that optimizes their efficiency and makes them enjoyable to read.
-        Present your startup idea in a format that quickly grabs their attention and conveys its unique value.
-        Conversational and Understandable:
-
-        Imagine explaining your idea to someone who is not well-versed in your industry or field.
-        Strive for a conversational tone, as if you were chatting with a friend about your startup.
-        Use language that resonates with a general audience, avoiding technical jargon or complex terminology.
-        Make your idea easy to remember and repeat. Aim for a description that naturally lends itself to word-of-mouth sharing.
-        Empathy for Users and Customers:
-
-        Prioritize the needs of your potential users and customers by making your idea accessible and comprehensible to them.
-        Frame your pitch in a way that resonates with a broad audience, not just those deeply involved in your industry.
-        Imagine someone who has never encountered your concept before and ensure that your description helps them grasp its significance.
-        In summary, the style of speech involves using simple, clear, and concise language while avoiding unnecessary padding or jargon. Incorporate empathy for both investors and potential users by crafting descriptions that are easy to understand, relatable, and compelling. Utilize the "X for Y" formula effectively to highlight your startup's value proposition.
-        ```
-        """
-
-        style_instruction = """
-        ИНСТРУКЦИЯ:
-        Примени СТИЛЬ к ТЕКСТУ.
-
-        ТЕКСТ:
-        {text}
-        """
-
-        style_prompt = style_description + style_instruction
-
-        llm = self._init_gpt3_model()
-        chain = self._create_llmchain(style_prompt, llm)
-        result = chain(raw_result)["text"]
+        result = chain(text)["text"]
 
         return result
 
@@ -301,96 +227,40 @@ class PitchAssistant:
     def solution(self, text: str) -> str:
         """ """
 
-        super_product_description = """
-        Супер Продукт:   
-        Очевидное преимущество - продукт, который значительно лучше конкурентов. Продукт должен быть на порядок (в 10 раз) более привлекательным и эффективным.
-        """
+        solution_prompt = """
+        Задачи:
+        Кратко опиши решение по пунктам, чтобы в каждом слове было максимум 5 слов, для слайда презентации, чтобы не было много текста по описанию текста {text} 
 
-        solution_instruction = """
-        ЗАГЛУШКА
-        {text}
-        """
+        !!Каждый пункт должен содержать максимум 5 слов!!
 
-        solution_prompt = super_product_description + solution_instruction
+        Пример вывода: 
+        !<<- Создание бесплатного курса
+        - Создание чат-бота для поиска вакансий>>!
+        """
 
         llm = self._init_gpt3_model()
         chain = self._create_llmchain(solution_prompt, llm)
-        raw_result = chain(text)["text"]
-
-        style_description = """
-        СТИЛЬ:
-        ```
-        Here are the detailed instructions or style of speech for each of the mentioned topics:
-
-        Simplicity and Clarity:
-
-        Use straightforward language that anyone can understand, avoiding complex terminology or convoluted explanations.
-        Present your idea in a way that leaves no room for interpretation or confusion. Make it crystal clear.
-        Focus on making your idea easily digestible, ensuring that even someone unfamiliar with your field can comprehend it.
-        Eliminate any vagueness or ambiguity in your description. Be explicit about what your startup does and the problem it solves.
-        Stay away from using jargon, buzzwords, or language that might not resonate with a broader audience.
-        Conciseness:
-
-        Condense your description to the most essential points. Trim away any extraneous details.
-        Craft a succinct and powerful statement that encapsulates the core of your startup's value proposition.
-        Prioritize brevity while still conveying the crucial aspects of your idea. Every word should serve a purpose.
-        Avoiding Padding:
-
-        Remove any unnecessary fluff or filler content from your pitch or description.
-        Stay focused on the key elements that make your startup unique and valuable. Discard information that doesn't contribute to this understanding.
-        Resist the temptation to add defensive explanations or preemptive responses to potential concerns. Let your idea stand on its merits.
-        "X for Y" Formula:
-
-        Choose a well-known and successful entity (X) that shares similarities with your startup's concept.
-        Clearly state the comparison: "We are the X for Y," indicating the familiar model you're adapting.
-        Highlight how Y, your target market or segment, can benefit from the attributes of X's model.
-        Ensure that the connection between X and Y is easily understandable, even to someone unfamiliar with either.
-        Empathy for Investors:
-
-        Put yourself in the shoes of investors who have limited time to review many ideas.
-        Craft your pitch and descriptions in a way that optimizes their efficiency and makes them enjoyable to read.
-        Present your startup idea in a format that quickly grabs their attention and conveys its unique value.
-        Conversational and Understandable:
-
-        Imagine explaining your idea to someone who is not well-versed in your industry or field.
-        Strive for a conversational tone, as if you were chatting with a friend about your startup.
-        Use language that resonates with a general audience, avoiding technical jargon or complex terminology.
-        Make your idea easy to remember and repeat. Aim for a description that naturally lends itself to word-of-mouth sharing.
-        Empathy for Users and Customers:
-
-        Prioritize the needs of your potential users and customers by making your idea accessible and comprehensible to them.
-        Frame your pitch in a way that resonates with a broad audience, not just those deeply involved in your industry.
-        Imagine someone who has never encountered your concept before and ensure that your description helps them grasp its significance.
-        In summary, the style of speech involves using simple, clear, and concise language while avoiding unnecessary padding or jargon. Incorporate empathy for both investors and potential users by crafting descriptions that are easy to understand, relatable, and compelling. Utilize the "X for Y" formula effectively to highlight your startup's value proposition.
-        ```
-        """
-
-        style_instruction = """
-        ИНСТРУКЦИЯ:
-        Примени СТИЛЬ к ТЕКСТУ.
-
-        ТЕКСТ:
-        {text}
-        """
-
-        style_prompt = style_description + style_instruction
-
-        llm = self._init_gpt3_model()
-        chain = self._create_llmchain(style_prompt, llm)
-        result = chain(raw_result)["text"]
+        result = chain(text)["text"]
 
         return result
 
-    def market_tam(self, text: str) -> str:
+    def market_tam(self, text: str, place="russia") -> str:
         """ """
 
-        tom_sys_prompt = (
-            "You are very powerful assistant, that creates a TOM, SAM, SOM analysis."
-        )
+        tom_sys_prompt = "You are very powerful assistant, that creates a TOM analysis."
 
-        llm = self._init_gpt3_model()
+        # llm = self._init_gpt3_model()
+        llm = self._init_gpt4_model()
         agent = self._create_ddg_agent(tom_sys_prompt, llm)
-        result = agent(text)['output']
+
+        # if international:
+        #     place = 'the world'
+        # else:
+        #     place = 'russia'
+
+        prompt = f"Find Market Research for a {text} in {place}. And give me a number either in rubbles or in amount of clients or demand."
+
+        result = agent(prompt)["output"]
 
         return result
 
@@ -500,8 +370,24 @@ class PitchAssistant:
         )
 
         llm = self._init_gpt3_model()
+        # llm = self._init_gpt4_model(high_temp=True)
+        # llm = self._init_gpt4_model(high_temp=False)
         agent = self._create_ddg_agent(agent_description, llm)
-        result = agent(prompt)["output"]
+        raw_result = agent(prompt)["output"]
+
+        # shorten for a slide
+        competitor_prompt = """
+        Задачи:
+        Напиши конкурентов по пунктам, для слайда презентации, чтобы не было много текста по описанию текста {text} 
+
+        !!Используй исключительно название компании!!
+        !!Если нет компаний, ничего не пиши!!
+
+        """
+
+        llm = self._init_gpt3_model()
+        chain = self._create_llmchain(competitor_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
 
@@ -513,6 +399,8 @@ class PitchAssistant:
         agent_description = """You are a very powerful assistant who determines the competitive advantages of the company in relation to its competitors. You are given the name of the company and its description, as well as the names of competitors. If necessary, you can search for additional information about competitors in order to deduce the company's competitive advantages."""
 
         llm = self._init_gpt3_model()
+        # llm = self._init_gpt4_model(high_temp=True)
+        # llm = self._init_gpt4_model(high_temp=False)
         agent = self._create_ddg_agent(agent_description, llm)
 
         text = f"""Название и описание компании: {company_description}
@@ -522,7 +410,18 @@ class PitchAssistant:
 
         Тебе нужно вывести конкурентные преимущества компании.
         """
-        result = agent(text)["output"]
+        raw_result = agent(text)["output"]
+
+        # shorten
+        advantages_prompt = """
+        Задача:
+        Напиши преимущества по пунктам для слайда презентации, используя максимум 5 слов для пункта, чтобы не было много текста по описанию текста {text}. 
+
+        """
+
+        llm = self._init_gpt3_model()
+        chain = self._create_llmchain(advantages_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
 
@@ -537,7 +436,17 @@ class PitchAssistant:
 
         llm = self._init_gpt3_model()
         chain = self._create_llmchain(prompt, llm)
-        result = chain(company_description)["text"]
+        raw_result = chain(company_description)["text"]
+
+        costs_prompt = '''
+        Задача:
+        Напиши текст сокращенно по пунктам для слайда презентации, используя максимум 5 слов для пункта, чтобы не было много текста по описанию текста {text}. 
+
+        '''
+
+        llm = self._init_gpt3_model()
+        chain = self._create_llmchain(costs_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
 
@@ -552,7 +461,17 @@ class PitchAssistant:
 
         llm = self._init_gpt3_model()
         chain = self._create_llmchain(prompt, llm)
-        result = chain(company_description)["text"]
+        raw_result = chain(company_description)["text"]
+
+        channels_prompt = '''
+        Задача:
+        Напиши текст сокращенно по пунктам для слайда презентации, используя максимум 5 слов для пункта, чтобы не было много текста по описанию текста {text}. 
+
+        '''
+
+        llm = self._init_gpt3_model()
+        chain = self._create_llmchain(channels_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
 
@@ -567,7 +486,16 @@ class PitchAssistant:
 
         llm = self._init_gpt3_model()
         chain = self._create_llmchain(prompt, llm)
-        result = chain(company_description)["text"]
+        raw_result = chain(company_description)["text"]
+
+        scaling_prompt = '''
+        Задача:
+        Напиши текст сокращенно по пунктам для слайда презентации, используя максимум 5 слов для пункта, чтобы не было много текста по описанию текста {text}. 
+        '''
+
+        llm = self._init_gpt3_model()
+        chain = self._create_llmchain(scaling_prompt, llm)
+        result = chain(raw_result)["text"]
 
         return result
 
@@ -749,3 +677,56 @@ class PitchAssistant:
         result = chain(text)["text"]
 
         return result
+    
+    def _text_preproc_for_presentation(self,streamlit_session_state:dict) -> str:
+        '''
+        '''
+
+        company_name = streamlit_session_state['company_name']
+        short_description  = streamlit_session_state['short_description']
+        short_description_gpt  = streamlit_session_state['short_description_gpt']
+        problem_description  = streamlit_session_state['problem_description']
+        problem_description_gpt  = streamlit_session_state['problem_description_gpt']
+        value_and_description  = streamlit_session_state['value_and_description']
+        value_and_description_gpt  = streamlit_session_state['value_and_description_gpt']
+        solution  = streamlit_session_state['solution']
+        solution_gpt  = streamlit_session_state['solution_gpt']
+        tam  = streamlit_session_state['tam']
+        tam_summary  = streamlit_session_state['tam_summary']
+        sam_instruction  = streamlit_session_state['sam_instruction']
+        sam  = streamlit_session_state['sam']
+        som_instruction  = streamlit_session_state['som_instruction']
+        som  = streamlit_session_state['som']
+        competitors_list_gpt  = streamlit_session_state['competitors_list_gpt']
+        competitive_advantages_gpt  = streamlit_session_state['competitive_advantages_gpt']
+        profit_and_costs_example  = streamlit_session_state['profit_and_costs_example']
+        business_model_1  = streamlit_session_state['business_model_1']
+        acquisition_example  = streamlit_session_state['acquisition_example']
+        business_model_2  = streamlit_session_state['business_model_2']
+        bis_model_scaling_example  = streamlit_session_state['bis_model_scaling_example']
+        business_model_3  = streamlit_session_state['business_model_3']
+        year_earnings  = streamlit_session_state['year_earnings']
+        clients_amount  = streamlit_session_state['clients_amount']
+        metrics  = streamlit_session_state['metrics']
+        traction_and_partners_example  = streamlit_session_state['traction_and_partners_example']
+        traction_and_partners  = streamlit_session_state['traction_and_partners']
+        team  = streamlit_session_state['team']
+        team_gpt_example  = streamlit_session_state['team_gpt_example']
+        investment_round_example  = streamlit_session_state['investment_round_example']
+        investment_round  = streamlit_session_state['investment_round']
+        roadmap  = streamlit_session_state['roadmap']
+        roadmap_gpt  = streamlit_session_state['roadmap_gpt']
+        contacts  = streamlit_session_state['contacts']
+        contacts_gpt  = streamlit_session_state['contacts_gpt']
+    
+    # Финальное создание текста презентации
+    
+    def create_presentation_text(self,) -> str:
+        '''
+        '''
+
+        prompt = ''''''
+
+        llm = self._init_gpt4_32k_model()
+        chain = self._create_llmchain(prompt,llm)
+        result = chain(text)['text']
